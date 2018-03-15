@@ -1,7 +1,7 @@
-from flask import Flask, request, flash, make_response, jsonify
+from flask import Flask, request, flash, render_template
 from flask_sqlalchemy import SQLAlchemy
 
-import imageboard.config as config
+import config
 
 app = Flask(__name__, template_folder='templates')
 app.config.from_object(config)
@@ -11,11 +11,11 @@ db = SQLAlchemy(app)
 
 @app.route('/posts', methods=['GET', 'POST'])
 def index():
-    from imageboard.models import Post
-    from imageboard.forms import PostFullForm
+    from models import Post
+    from forms import PostForm
 
     if request.method == 'POST':
-        form = PostFullForm(request.form)
+        form = PostForm(request.form)
 
         if form.validate():
             post = Post(**form.data)
@@ -24,31 +24,24 @@ def index():
 
             flash('Пост опубликован.')
 
-            resp = make_response(jsonify(post.to_dict()), 201)
-            resp.headers['Location'] = '/posts/{}'.format(post.id)
-            return resp
-
         else:
             flash('Форма не валидна! Пост не был опубликован.')
             flash(str(form.errors))
 
     posts = Post.query.all()
-    return jsonify([p.to_dict() for p in posts])
+
+    return render_template('posts.txt', posts=posts)
 
 
-@app.route('/posts/<int:post_id>', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+@app.route('/posts/<int:post_id>', methods=['GET', 'POST'])
 def show_post(post_id):
-    from imageboard.models import Comment, Post
-    from imageboard.forms import CommentForm, PostPatchForm
-    from datetime import datetime
+    from models import Comment, Post
+    from forms import CommentForm
 
     post = Post.query.filter_by(id=post_id).first()
 
     if post is None:
-        if request.method != 'DELETE':
-            return 'Not Found', 404
-        else:
-            return 'No Content', 204
+        return 'Not Found', 404
 
     if request.method == 'POST':
         form = CommentForm(request.form)
@@ -56,6 +49,9 @@ def show_post(post_id):
         if form.validate():
             comment = Comment(post=post, content=request.form['content'])
             db.session.add(comment)
+
+            post.number_of_comments += 1
+
             db.session.commit()
 
             flash('Комментарий опубликован.')
@@ -64,29 +60,13 @@ def show_post(post_id):
             flash('Форма не валидна! Комментарий не был опубликован.')
             flash(str(form.errors))
 
-    if request.method == 'PATCH':
-        form = PostPatchForm(request.form)
+    comments = Comment.query.filter_by(post_id=post.id).all()
 
-        if form.validate():
-            post.content = request.form['content']
-            post.updated_at = datetime.now()
-
-            db.session.commit()
-            flash('Пост изменен.')
-
-        else:
-            flash('Форма не валидна! Пост не был изменен.')
-            flash(str(form.errors))
-
-    if request.method == 'DELETE':
-        post.is_visible = False
-        db.session.commit()
-
-    # return jsonify()
+    return render_template('item.txt', post=post, comments=comments)
 
 
 if __name__ == '__main__':
-    from imageboard.models import *
+    from models import *
 
     db.create_all()
     app.run()

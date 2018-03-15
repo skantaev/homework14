@@ -9,10 +9,13 @@
     {% endif %}
 {% endwith %}
 
-Посты в блоге:
-{% for item in posts %}
-    Заголовок: {{ item.title }}
-    Дата: {{ item.date_created }}
-    Текст: {{ item.content }}
+Заголовок поста: {{ post.title }}
+Дата поста: {{ post.date_created }}
+Текст поста: {{ post.content }}
+
+Комментарии:
+{% for comment in comments %}
+    Дата комментария: {{ comment.date_created }}
+    Текст комментария: {{ comment.content }}
 {% endfor %}
-Конец постов
+Конец комментариев

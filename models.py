@@ -1,5 +1,5 @@
 from datetime import datetime
-from imageboard.app import db
+from app import db
 
 
 class Post(db.Model):
@@ -7,18 +7,7 @@ class Post(db.Model):
     title = db.Column(db.String(60), nullable=False)
     content = db.Column(db.String(3000), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.now)
-    updated_at = date_created
-    is_visible = db.Column(db.Boolean, default=True, nullable=False)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'title': self.title,
-            'content': self.id,
-            'creation date': self.date_created,
-            'updated at': self.updated_at,
-            'deleted': self.is_visible
-        }
+    number_of_comments = db.Column(db.Integer, default=0)
 
 
 class Comment(db.Model):
@@ -32,15 +21,3 @@ class Comment(db.Model):
     post = db.relationship(Post, foreign_keys=[post_id])
     content = db.Column(db.String(3000), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.now)
-    updated_at = date_created
-    is_visible = db.Column(db.Boolean, default=True, nullable=False)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'post_id': self.post_id,
-            'content': self.id,
-            'creation date': self.date_created,
-            'updated at': self.updated_at,
-            'deleted': self.is_visible
-        }
