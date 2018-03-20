@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+    <title>Анонимная гостевая книга</title>
+</head>
+<body>
+    <div class="content">
+        <h1 align="center">Анонимная гостевая книга</h1>
+        <br>
+        <div>
+             <!--  Всплывающие сообщения, если форма не валидна -->
+            {% for message in get_flashed_messages() %}
+            <div class="flash">{{ message }}</div><br>
+            {% endfor %}
+        </div>
+            {% block body %}
+                Основной блок тут
+            {% endblock %}
+    </div>
+</body>
+</html>

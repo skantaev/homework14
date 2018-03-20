@@ -1,0 +1,48 @@
+{% extends "guest_book.html" %}
+
+{% block body %}
+    <article>
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.content }}</p>
+    </article>
+
+    <div style="float:left; width:25%; font-size: 14px;">
+        <a href="{{ url_for('index') }}">Назад к постам</a>
+    </div>
+
+    <div style="float:right; width:25%; text-align: right; font-size: 14px;">
+        {{ post.date_created.strftime('%d/%m/%Y %H:%M:%S') }}
+    </div>
+    <br><br>
+
+    <div class="add">
+        <form action="{{ url_for('show_post', post_id=post.id) }}" method="POST">
+
+            <label for="content">Текст комментария:</label>
+            <textarea id="content" name="content" style="height:80px" class="form"></textarea>
+
+            <input type="submit" value="Опубликовать">
+        </form>
+    </div>
+    <br>
+
+    {% if not comments %}
+        <h2>Комментариев пока нет</h2>
+    {% else %}
+        <h2>Комментарии:</h2>
+        {% for comment in comments %}
+
+            <div class="box">
+                <div>
+                    <p>{{ comment.content }}</p>
+                </div>
+
+                <div style="font-size: 14px; text-align: right;">
+                    {{ comment.date_created.strftime('%d/%m/%Y %H:%M:%S') }}
+                </div>
+            </div>
+
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}

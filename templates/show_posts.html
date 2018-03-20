@@ -1,0 +1,41 @@
+{% extends "guest_book.html" %}
+
+
+{% block body %}
+    <div class="add">
+        <form action="{{ url_for('index') }}" method="POST">
+            <label for="title">Заголовок:</label>
+            <input type="text" id="title" name="title" class="form">
+
+            <label for="content">Текст:</label>
+            <textarea id="content" name="content" style="height:120px" class="form"></textarea>
+
+            <input type="submit" value="Опубликовать">
+        </form>
+    </div>
+    <br>
+
+    <!-- Выводим самые новые посты сначала -->
+    {% for post in posts[::-1] %}
+
+    <div class="box">
+        <div style="float:left; width:80%; font-weight: bold; ">
+            {{ post.title }}
+        </div>
+        <div style="float:right; width:20%; text-align: right; ">
+            №{{ post.id }}
+        </div>
+
+        <div><p><br>{{ post.content }}</p></div>
+
+        <div style="float:left; width:25%; font-size: 14px;">
+            <a href="{{ url_for('show_post', post_id=post.id) }}">Комментарии: {{ post.number_of_comments }}</a>
+        </div>
+        <div style="float:right; width:25%; text-align: right; font-size: 14px;">
+            {{ post.date_created.strftime('%d/%m/%Y %H:%M:%S') }}
+        </div>
+    </div>
+
+    {% endfor %}
+
+{% endblock %}
